@@ -29,10 +29,12 @@
     "react-dom": "^18.3.1",
     "react-spinners": "^0.14.1",
     "react-spinners-kit": "^1.9.1",
+    "react-toastify": "^10.0.6",
     "react-typed": "^2.0.12",
     "slate": "^0.110.2",
     "slate-history": "^0.110.3",
     "slate-react": "^0.110.3",
+    "tailwind-scrollbar-hide": "^1.1.7",
     "yjs": "^13.6.20"
   },
   "devDependencies": {
