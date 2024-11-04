@@ -1,4 +1,5 @@
 import { Dispatch, RefObject, SetStateAction, useEffect, useRef, useState, type ReactElement } from 'react'
+import { motion } from 'framer-motion'
 import user1 from '../../assets/1.webp'
 import user2 from '../../assets/2.webp'
 import user3 from '../../assets/3.webp'
@@ -11,6 +12,7 @@ import user9 from '../../assets/9.webp'
 import user10 from '../../assets/10.webp'
 import chat_bg from '../../assets/chat_bg2.webp'
 import { toast } from 'react-toastify'
+import { fadeIn } from '../../utils/functions'
 
 interface ChatProps {
     chatIsOpen: boolean,
@@ -144,16 +146,21 @@ export const Chat = ({ chatIsOpen, setChatIsOpen }: ChatProps): ReactElement => 
                                     {
                                         chatStream.length > 0 && chatStream.map((text) => (
                                             <div key={text.id} className={`flex flex-col px-2 py-1 ${text.sender === 'me' ? 'items-end' : 'items-start'}`}>
-                                                <div className={`px-2 py-1 rounded-[8px] shadow-sm ${text.sender === 'me' ? 'bg-indigo-200' : 'bg-gray-50'}`}>
+                                                <motion.div
+                                                    variants={fadeIn(text.sender === 'me' ? 'left' : 'right', 0.03)}
+                                                    initial={'hidden'}
+                                                    whileInView={'show'}
+                                                    viewport={{ once: true, amount: 0.1 }}
+                                                    className={`px-2 py-1 rounded-[8px] shadow-sm ${text.sender === 'me' ? 'bg-indigo-200' : 'bg-gray-50'}`}>
                                                     <p className='text-[0.9rem] text-gray-800'>{text.text}</p>
-                                                </div>
+                                                </motion.div>
                                             </div>
                                         ))
                                     }
                                     <div ref={scrollRef}></div>
                                 </div>
                                 <form onSubmit={handleSubmitToChat} className="h-10 w-full flex items-center bg-[#40403e] p-2 z-10">
-                                    <input value={currChatValue} onChange={({ target }) => { setCurrChatValue(target.value) }} type="text" className='relative h-6 w-full bg-[#10100e] rounded-full px-2 text-gray-200 text-[0.8rem] outline-none' />
+                                    <input value={currChatValue} onChange={({ target }) => { setCurrChatValue(target.value) }} type="text" className='relative h-6 w-full bg-[#10100e] rounded-full pl-2 pr-9 text-gray-200 text-[0.8rem] outline-none' />
                                     <button type='submit' className='absolute right-5 '>
                                         <i className="fa-solid fa-paper-plane text-gray-200"></i>
                                     </button>
