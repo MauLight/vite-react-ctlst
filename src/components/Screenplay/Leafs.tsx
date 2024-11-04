@@ -1,4 +1,4 @@
-import { LeafProps } from "../../types"
+import { LeafProps } from "../../utils/types"
 
 
 //* Leaves must be inline elements.

@@ -1,7 +1,7 @@
-import { ScreenplayPosterProps } from '@/utils/types'
+import { ScreenplayPosterProps } from '../utils/types'
 import { useRef, useState, type ReactElement } from 'react'
 
-export const ScreenplayCard = ({ item } : { item: ScreenplayPosterProps }): ReactElement => {
+export const ScreenplayCard = ({ item }: { item: ScreenplayPosterProps }): ReactElement => {
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const ref = useRef(null)
 

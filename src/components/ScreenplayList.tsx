@@ -1,6 +1,6 @@
 import { type ReactElement } from 'react'
-import { randomAddedArrayBuilder } from '@/utils/lists'
-import { ScreenplayPosterProps } from '@/utils/types'
+import { randomAddedArrayBuilder } from '../utils/lists'
+import { ScreenplayPosterProps } from '../utils/types'
 import { ScreenplayCard } from './ScreenplayCard'
 
 export const ScreenplayList = (): ReactElement => {
