@@ -38,7 +38,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.1.0",
     "@eslint/js": "^9.14.0",
-    "@tanstack/router-devtools": "^1.78.2",
+    "@tanstack/router-devtools": "^1.78.3",
     "@tanstack/router-plugin": "^1.78.2",
     "@types/lodash.debounce": "^4.0.9",
     "@types/node": "^22.8.6",
