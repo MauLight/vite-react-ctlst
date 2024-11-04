@@ -2,13 +2,13 @@ import { PriceCard } from '../components/Common/PriceCard'
 import { Switch } from '../components/Common/Switch'
 import { useState, type ReactElement } from 'react'
 
-export const Pricing = ({ handlePro } : { handlePro: () => void }): ReactElement => {
-  const[clicked, setClicked] = useState<boolean>(true)
+export const Pricing = ({ handlePro }: { handlePro: () => void }): ReactElement => {
+  const [clicked, setClicked] = useState<boolean>(true)
   const handleClick = (): void => {
     setClicked(!clicked)
   }
   return (
-    <div className='relative w-full h-full px-10 py-12'>
+    <div className='relative w-full h-[800px] px-10 py-12'>
       <i onClick={handlePro} className="fa-solid fa-xmark fa-md absolute top-2 right-0 hover:rotate-45 hover:text-indigo-500 transition-all duration-200"></i>
       {/* header */}
       <div className="flex justify-between">
@@ -31,7 +31,7 @@ export const Pricing = ({ handlePro } : { handlePro: () => void }): ReactElement
         </div>
         <div className="col-span-2 flex items-center py-5">
           <div className="w-full h-3/4 border border-[#40403e] rounded-[15px]">
-            <PriceCard clicked={clicked} size='en' price={clicked ? 12.9 : 18} saved={61.2} percentage={28} title='Enterprise Plan' description='Perfect for educators who want to harness the full capabilities of our software in the classroom.' cta='Select Basic' />
+            <PriceCard clicked={clicked} size='en' price={clicked ? 12.9 : 18} saved={61.2} percentage={28} title='Enterprise Plan' description='Perfect for educators who want to harness the full capabilities of our software in the classroom.' cta='Select Enterprise' />
           </div>
         </div>
       </div>
