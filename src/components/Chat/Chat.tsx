@@ -10,6 +10,7 @@ import user8 from '../../assets/8.webp'
 import user9 from '../../assets/9.webp'
 import user10 from '../../assets/10.webp'
 import chat_bg from '../../assets/chat_bg2.webp'
+import { toast } from 'react-toastify'
 
 interface ChatProps {
     chatIsOpen: boolean,
@@ -59,6 +60,12 @@ export const Chat = ({ chatIsOpen, setChatIsOpen }: ChatProps): ReactElement => 
             setChatStream([...chatStream, { id: chatStream.length + 1, text: currChatValue, date: Date.now().toString(), sender: 'me', recipient: selectedUser?.username || '' }])
             setCurrChatValue('')
         }
+    }
+
+    //* This needs to be changed for id
+    const handleCopyToClipboard = () => {
+        navigator.clipboard.writeText(selectedUser?.username || '')
+        toast.success(`UserId copied to clipboard.`)
     }
 
     useEffect(() => {
@@ -124,9 +131,14 @@ export const Chat = ({ chatIsOpen, setChatIsOpen }: ChatProps): ReactElement => 
                                 <div className="flex items-center gap-x-2 p-2 z-10 bg-[#40403e] w-full">
                                     <div className='relative flex'>
                                         <div className={`absolute right-0 bottom-0 w-2 h-2 ${selectedUser.active ? 'bg-green-500' : 'bg-transparent'} rounded-full`}></div>
-                                        <img className='w-8 h-8 rounded-full object-cover' src={selectedUser.pic} alt="user" />
+                                        <img className='w-8 h-8 min-w-8 rounded-full object-cover' src={selectedUser.pic} alt="user" />
                                     </div>
-                                    <h1 className='text-[0.9rem] text-gray-50'>{upperFirstLetter(selectedUser.username)}</h1>
+                                    <div className="flex w-full items-center justify-between">
+                                        <h1 className='text-[0.9rem] text-gray-50'>{upperFirstLetter(selectedUser.username)}</h1>
+                                        <button onClick={handleCopyToClipboard} className='text-gray-50 hover:text-indigo-500 transition-colors duration-200'>
+                                            <i className="fa-solid fa-plus"></i>
+                                        </button>
+                                    </div>
                                 </div>
                                 <div className='h-full w-full overflow-y-scroll scrollbar-hide py-2 z-10'>
                                     {
