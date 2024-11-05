@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactElement } from 'react'
+import { useState, type ReactElement } from 'react'
 import { Navbar } from './Navbar'
 import { Topbar } from './Topbar'
 import { Creator } from './Creator'
@@ -12,6 +12,8 @@ import { Help } from './Help'
 import Screenplay from './Screenplay'
 import { TheQuest } from './TheQuest'
 import { Chat } from './Chat/Chat'
+import { toast } from 'react-toastify'
+import { WaitingRoom } from './WaitingRoom'
 
 export const ScreenIndex = (): ReactElement => {
   const [step, setStep] = useState<number>(1)
@@ -35,9 +37,42 @@ export const ScreenIndex = (): ReactElement => {
     html2pdf().from(element).set(opt).save()
   }
 
+  const sendInvitationToUserAsync = async () => {
+    setTimeout(() => {
+      toast.success('User accepted the invitation.')
+      if (stream !== null) {
+        const removeWaitingRoom = stream.filter((elem) => elem.type !== 'waitingroom')
+        setStream([...removeWaitingRoom, { id: stream.length, type: 'screenplay', component: <Screenplay /> }])
+      }
+    }, 10000)
+  }
+
   const handleEnterInput = (e: { key: string }) => {
     if (e.key === 'Enter') {
       if (creatorInputValue.length > 0 && stream !== null) {
+
+        if (creatorInputValue.includes('invite')) {
+          console.log('this is an invite')
+
+          const invitedUser = creatorInputValue.split('/invite')[1].split(' ')[1].trim()
+          const invitedPriviledges = creatorInputValue.split('/invite')[1].split(' ')[2].trim()
+          console.log(invitedUser)
+          console.log(invitedPriviledges)
+
+          if (stream[stream.length - 1].type !== 'screenplay') {
+            toast.error('Screenplay instance must be open before inviting a user.')
+            return
+          }
+
+          toast.success(`Invitation sent to ${invitedUser}`)
+          setCreatorInputValue('')
+          setStream([...stream, { id: stream.length, type: 'waitingroom', component: <WaitingRoom /> }])
+
+          sendInvitationToUserAsync()
+
+          return
+        }
+
         switch (creatorInputValue) {
           case '/screenplay':
             setStream([...stream, { id: stream.length, type: 'screenplay', component: <Screenplay /> }])
@@ -67,13 +102,6 @@ export const ScreenIndex = (): ReactElement => {
     if (step === 3) setStep(1)
     else setStep(3)
   }
-
-  useEffect(() => {
-    const element = document.getElementById('screenplay')
-    if (element) {
-      element.focus()
-    }
-  }, [stream])
 
   return (
     <div className='w-full bg-[#fdfdfd] flex justify-center items-center px-20 overflow-scroll scrollbar-hide'>

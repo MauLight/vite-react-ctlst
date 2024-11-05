@@ -14,6 +14,7 @@
     "@hocuspocus/provider": "^2.13.7",
     "@hocuspocus/server": "^2.13.7",
     "@slate-yjs/core": "^1.0.2",
+    "@slate-yjs/react": "^1.1.0",
     "@tanstack/react-router": "^1.78.2",
     "axios": "^1.7.7",
     "date-fns": "^4.1.0",

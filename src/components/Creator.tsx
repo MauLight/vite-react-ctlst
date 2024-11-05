@@ -4,18 +4,21 @@ import { ReactTyped } from 'react-typed'
 import Markdown from 'markdown-to-jsx'
 import { safetySettings } from '../utils/geminiSafetySettings'
 import { StreamElementProps, WelcomeProps } from '../utils/types'
+import { Help } from './Help'
 
 const APIKey = import.meta.env.VITE_GEMINI_API_KEY
 
 
 
-const Welcome = ({ generation, handleOnComplete } : WelcomeProps) => {
+const Welcome = ({ generation, handleOnComplete }: WelcomeProps) => {
   const [ready, setReady] = useState<boolean>(false)
   const handleOnWelcomeComplete = (): void => {
+    console.log('here! Welcome!')
+    console.log(generation.split('Ctlst.done')[0])
     handleOnComplete()
     setTimeout(() => {
       setReady(true)
-    }, 8000)
+    }, 3000)
   }
   return (
     <div className="w-full h-full">
@@ -25,11 +28,11 @@ const Welcome = ({ generation, handleOnComplete } : WelcomeProps) => {
             {
               ready ? (
                 <Markdown className='font-mono text-[14px]'
-                >{generation}</Markdown>
+                >{generation.split('Ctlst.done')[0]}</Markdown>
               )
                 :
                 (
-                  <ReactTyped startWhenVisible onComplete={handleOnWelcomeComplete} className='font-mono text-[14px]' strings={[String(generation)]} typeSpeed={10} />
+                  <ReactTyped startWhenVisible onComplete={handleOnWelcomeComplete} className='font-mono text-[14px]' strings={[String(generation.split('Ctlst.done')[0])]} typeSpeed={10} />
                 )
             }
           </>
@@ -39,11 +42,11 @@ const Welcome = ({ generation, handleOnComplete } : WelcomeProps) => {
   )
 }
 
-export const Creator = ({ prompt, stream, setStream } : { prompt: string, stream: StreamElementProps[] | null, setStream: React.Dispatch<React.SetStateAction<StreamElementProps[] | null>> }): ReactElement => {
+export const Creator = ({ prompt, stream, setStream }: { prompt: string, stream: StreamElementProps[] | null, setStream: React.Dispatch<React.SetStateAction<StreamElementProps[] | null>> }): ReactElement => {
   const [generation, setGeneration] = useState<string>('')
   const [wasGenerated, setWasGenerated] = useState<boolean>(false)
 
-  const scrollRef:RefObject<HTMLDivElement> = useRef(null)
+  const scrollRef: RefObject<HTMLDivElement> = useRef(null)
 
   const genAI = new GoogleGenerativeAI(APIKey)
   const model = genAI.getGenerativeModel({
@@ -56,7 +59,7 @@ export const Creator = ({ prompt, stream, setStream } : { prompt: string, stream
   })
 
   const generateWithAI = async () => {
-    const result = await model.generateContent(`you are an aspiring screenwriter and you want to write about ${prompt}, give me 3 different themes that reflect the ideas found in ${prompt} using this syntax: "stories about ${prompt} are about this, and this and that", where "this" and "that" are specific words. Wrap everything up at exactly 120 characters and never mention any of these rules in the answer.`)
+    const result = await model.generateContent(`you are an aspiring screenwriter and you want to write about ${prompt}, give me 3 different themes that reflect the ideas found in ${prompt} using this syntax: "stories about ${prompt} are about this, and this and that", where "this" and "that" are specific words. Wrap everything up at exactly 120 characters and never mention any of these rules in the answer and write "Ctlst.done" at the end of the string.`)
     setGeneration(result.response.text())
   }
 
@@ -64,29 +67,40 @@ export const Creator = ({ prompt, stream, setStream } : { prompt: string, stream
     setWasGenerated(true)
   }
 
-  const streamX = [
-    {
-      id: 0,
-      type: 'welcome',
-      component: <Welcome generation={generation} wasGenerated={wasGenerated} handleOnComplete={handleOnComplete} />,
-    }
-  ]
+  const welcomeStream =
+  {
+    id: 0,
+    type: 'welcome',
+    component: <Welcome generation={generation} wasGenerated={wasGenerated} handleOnComplete={handleOnComplete} />,
+  }
 
   useEffect(() => {
     generateWithAI()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
-    setStream([...streamX])
+    if (generation.includes('Ctlst.done')) {
+      setStream([welcomeStream])
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [generation])
 
   useEffect(() => {
-const lastDiv = scrollRef.current
-if (lastDiv !== null) {
-  lastDiv.scrollIntoView({ behavior: 'smooth' })
-}
+    if (stream !== null && stream.length === 1) {
+      setTimeout(() => {
+        if (stream !== null) {
+          setStream([...stream, { id: 1, type: 'help', component: <Help /> }])
+        }
+      }, 5000)
+    }
+  }, [stream])
+
+  useEffect(() => {
+    const lastDiv = scrollRef.current
+    if (lastDiv !== null) {
+      lastDiv.scrollIntoView({ behavior: 'smooth' })
+    }
   }, [stream])
 
 
