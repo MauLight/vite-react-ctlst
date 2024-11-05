@@ -4,6 +4,7 @@ import { Slate, Editable, withReact, ReactEditor } from 'slate-react'
 import { HocuspocusProvider } from '@hocuspocus/provider'
 import { ClassicSpinner } from 'react-spinners-kit'
 import debounce from 'lodash.debounce'
+import { Cursors } from "./Cursors"
 import * as Y from 'yjs'
 
 const isDev = import.meta.env.DEV
@@ -15,7 +16,7 @@ const weburl = isDev ? import.meta.env.VITE_WEBSOCKET_PORT_DEV : import.meta.env
 import { CharacterElement, DefaultElement, DialogElement, FadeElement, HeadingElement } from './Screenplay/Elements'
 import { LeafProps } from '../utils/types'
 import { Leaf } from './Screenplay/Leafs'
-import { withYjs, YjsEditor } from '@slate-yjs/core'
+import { withCursors, withYjs, YjsEditor } from '@slate-yjs/core'
 import axios from 'axios'
 
 type CustomElement = { type: 'heading' | 'description' | 'character' | 'dialog' | 'fade', children: CustomText[] }
@@ -39,7 +40,12 @@ interface RenderElementsProps {
 const ScreenEditor = ({ sharedType, provider }: { sharedType: any, provider: any, connectToServerAsync: any }): ReactElement => {
 
   const editor = useMemo(() => {
-    const e = withReact(withYjs(createEditor(), sharedType), provider.awareness)
+    const e = withReact(withCursors(withYjs(createEditor(), sharedType), provider.awareness, {
+      data: {
+        name: 'Owner',
+        color: '#ec4899'
+      }
+    }))
     const { normalizeNode } = e
     e.normalizeNode = entry => {
       const [node] = entry
@@ -273,13 +279,15 @@ const ScreenEditor = ({ sharedType, provider }: { sharedType: any, provider: any
         initialValue={initialValue}
         onChange={handleEditorChange}
       >
-        <Editable
-          id="screenplay"
-          onKeyDown={handleKeyDown}
-          renderElement={renderElement}
-          renderLeaf={renderLeaf}
-          className="outline-none p-20 w-[816px] min-h-[416px]"
-        />
+        <Cursors>
+          <Editable
+            id="screenplay"
+            onKeyDown={handleKeyDown}
+            renderElement={renderElement}
+            renderLeaf={renderLeaf}
+            className="outline-none p-20 w-[816px] min-h-[416px]"
+          />
+        </Cursors>
       </Slate>
     </div>
   )
