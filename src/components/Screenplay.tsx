@@ -16,6 +16,8 @@ import { CharacterElement, DefaultElement, DialogElement, FadeElement, HeadingEl
 import { LeafProps } from '../utils/types'
 import { Leaf } from './Screenplay/Leafs'
 import { withCursors, withYjs, YjsEditor } from '@slate-yjs/core'
+import { useMutation } from "@tanstack/react-query"
+import { postScreenplay } from "../api/apiCalls"
 
 type CustomElement = { type: 'heading' | 'description' | 'character' | 'dialog' | 'fade', children: CustomText[] }
 type CustomText = { text: string, bold?: boolean, italic?: boolean }
@@ -296,15 +298,24 @@ const Screenplay = () => {
   const [provider, setProvider] = useState<HocuspocusProvider>()
   const currUser = JSON.parse(localStorage.getItem('ctlst-user') || '')
 
-  const connectToServerAsync = async () => {
+  const mutation = useMutation({
+    mutationFn: postScreenplay,
+    onSuccess: (res) => {
+      connectToServerAsync(res.id)
+    },
+    onError: (error) => {
+      console.log(error.message)
+    }
+  })
+
+  const connectToServerAsync = async (id: string) => {
     const token = currUser.token
     const yDoc = new Y.Doc()
     const sharedDoc = yDoc.get('screenwriter', Y.XmlText)
     const yProvider = new HocuspocusProvider({
       url: weburl,
-      name: 'ctlst-screenwriter',
+      name: id,
       document: yDoc,
-
       token
     })
     yProvider.on('sync', () => {
@@ -322,7 +333,7 @@ const Screenplay = () => {
   }
 
   useEffect(() => {
-    connectToServerAsync()
+    mutation.mutate({ title: '', body: '' })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

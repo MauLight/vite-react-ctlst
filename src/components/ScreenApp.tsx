@@ -1,19 +1,22 @@
 import { useState, type ReactElement } from 'react'
+// @ts-expect-error: Unreachable code error
+import html2pdf from 'html2pdf.js'
+import { format } from 'date-fns'
+import { toast } from 'react-toastify'
+
+//* Components
 import { Navbar } from './Navbar'
 import { Topbar } from './Topbar'
 import { Creator } from './Creator'
 import { ScreenHome } from './ScreenHome'
 import { Pricing } from './Pricing'
-import { StreamElementProps } from '../utils/types'
-// @ts-expect-error: Unreachable code error
-import html2pdf from 'html2pdf.js'
-import { format } from 'date-fns'
 import { Help } from './Help'
 import Screenplay from './Screenplay'
 import { TheQuest } from './TheQuest'
 import { Chat } from './Chat/Chat'
-import { toast } from 'react-toastify'
 import { WaitingRoom } from './WaitingRoom'
+
+import { StreamElementProps } from '../utils/types'
 
 export const ScreenIndex = (): ReactElement => {
   const [step, setStep] = useState<number>(1)
@@ -22,7 +25,7 @@ export const ScreenIndex = (): ReactElement => {
   const [stream, setStream] = useState<StreamElementProps[] | null>(null)
   const [creatorInputValue, setCreatorInputValue] = useState<string>('')
 
-  const [chatIsOpen, setChatIsOpen] = useState(false)
+  const [chatIsOpen, setChatIsOpen] = useState<boolean>(false)
 
   const handlePrintScreenplay = (): void => {
     const element = document.getElementById('screenplay')
@@ -42,7 +45,7 @@ export const ScreenIndex = (): ReactElement => {
       toast.success('User accepted the invitation.')
       if (stream !== null) {
         const removeWaitingRoom = stream.filter((elem) => elem.type !== 'waitingroom')
-        setStream([...removeWaitingRoom, { id: stream.length, type: 'screenplay', component: <Screenplay /> }])
+        setStream([...removeWaitingRoom])
       }
     }, 10000)
   }
@@ -52,12 +55,9 @@ export const ScreenIndex = (): ReactElement => {
       if (creatorInputValue.length > 0 && stream !== null) {
 
         if (creatorInputValue.includes('invite')) {
-          console.log('this is an invite')
 
           const invitedUser = creatorInputValue.split('/invite')[1].split(' ')[1].trim()
-          const invitedPriviledges = creatorInputValue.split('/invite')[1].split(' ')[2].trim()
           console.log(invitedUser)
-          console.log(invitedPriviledges)
 
           if (stream[stream.length - 1].type !== 'screenplay') {
             toast.error('Screenplay instance must be open before inviting a user.')
@@ -124,7 +124,6 @@ export const ScreenIndex = (): ReactElement => {
           )
         }
       </div>
-      {/* navbar */}
       <Navbar
         creatorInputValue={creatorInputValue}
         setCreatorInputValue={setCreatorInputValue}
