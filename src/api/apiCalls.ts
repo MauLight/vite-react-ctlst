@@ -8,9 +8,10 @@ interface LoginProps {
 
 export const postLogin = async (credentials: LoginProps) => {
     try {
-        const response = await axios.post(`${url}/user`, credentials)
+        const response = await axios.post(`${url}/login`, credentials)
         if (response) {
-            localStorage.setItem('ctlst-user', response.data)
+            console.log(response.data)
+            localStorage.setItem('ctlst-user', JSON.stringify(response.data))
         }
 
     } catch (error) {

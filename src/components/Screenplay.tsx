@@ -2,14 +2,13 @@ import { createEditor, BaseEditor, Descendant, Transforms, Element, Editor } fro
 import { useCallback, useEffect, useMemo, useState, type ReactElement } from 'react'
 import { Slate, Editable, withReact, ReactEditor } from 'slate-react'
 import { HocuspocusProvider } from '@hocuspocus/provider'
-import { ClassicSpinner } from 'react-spinners-kit'
+
 import debounce from 'lodash.debounce'
 import { Cursors } from "./Cursors"
 import * as Y from 'yjs'
+import { FadeLoader } from "react-spinners"
 
 const isDev = import.meta.env.DEV
-
-const url = isDev ? import.meta.env.VITE_BACKEND_PORT_DEV : import.meta.env.VITE_BACKEND_PORT_PROD
 const weburl = isDev ? import.meta.env.VITE_WEBSOCKET_PORT_DEV : import.meta.env.VITE_WEBSOCKET_PORT_PROD
 
 //* Components
@@ -17,7 +16,6 @@ import { CharacterElement, DefaultElement, DialogElement, FadeElement, HeadingEl
 import { LeafProps } from '../utils/types'
 import { Leaf } from './Screenplay/Leafs'
 import { withCursors, withYjs, YjsEditor } from '@slate-yjs/core'
-import axios from 'axios'
 
 type CustomElement = { type: 'heading' | 'description' | 'character' | 'dialog' | 'fade', children: CustomText[] }
 type CustomText = { text: string, bold?: boolean, italic?: boolean }
@@ -37,12 +35,12 @@ interface RenderElementsProps {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ScreenEditor = ({ sharedType, provider }: { sharedType: any, provider: any, connectToServerAsync: any }): ReactElement => {
+const ScreenEditor = ({ sharedType, provider, username }: { sharedType: any, provider: any, connectToServerAsync: any, username: string }): ReactElement => {
 
   const editor = useMemo(() => {
     const e = withReact(withCursors(withYjs(createEditor(), sharedType), provider.awareness, {
       data: {
-        name: 'Owner',
+        name: username,
         color: '#ec4899'
       }
     }))
@@ -259,7 +257,6 @@ const ScreenEditor = ({ sharedType, provider }: { sharedType: any, provider: any
     debounce((value: Descendant[]) => {
       const content = JSON.stringify(value)
       localStorage.setItem('ctlst-user-screenplay', content)
-      console.log('saved to localStorage')
     }, 2000), []
   )
 
@@ -297,20 +294,17 @@ const Screenplay = () => {
   const [connected, setConnected] = useState<boolean>(false)
   const [sharedType, setSharedType] = useState<Y.XmlText>()
   const [provider, setProvider] = useState<HocuspocusProvider>()
-
-  const getTokenAsync = async () => {
-    const response: { data: { token: string } } = await axios.get(`${url}/api/auth`)
-    return response.data.token
-  }
+  const currUser = JSON.parse(localStorage.getItem('ctlst-user') || '')
 
   const connectToServerAsync = async () => {
-    const token = await getTokenAsync()
+    const token = currUser.token
     const yDoc = new Y.Doc()
     const sharedDoc = yDoc.get('screenwriter', Y.XmlText)
     const yProvider = new HocuspocusProvider({
       url: weburl,
       name: 'ctlst-screenwriter',
       document: yDoc,
+
       token
     })
     yProvider.on('sync', () => {
@@ -334,12 +328,13 @@ const Screenplay = () => {
 
   if (!connected || !sharedType || !provider) {
     return <div className='w-screen h-screen flex justify-center items-center'>
-      <ClassicSpinner />
+      <FadeLoader />
     </div>
   }
 
   return (
     <ScreenEditor
+      username={currUser.username || ''}
       connectToServerAsync={connectToServerAsync}
       sharedType={sharedType}
       provider={provider}

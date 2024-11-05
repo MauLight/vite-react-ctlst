@@ -18,7 +18,6 @@ const Login = (): ReactElement => {
   const [currStep, setCurrStep] = useState(1)
   const navigate = useNavigate()
 
-  //const queryClient = useQueryClient()
   const mutation = useMutation({
     mutationFn: postLogin,
     onSuccess: () => {
