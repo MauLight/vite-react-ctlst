@@ -28,7 +28,7 @@ export const Navbar = ({ step, creatorInputValue, setCreatorInputValue, handleEn
   }, [step])
 
   return (
-    <div className={`fixed bottom-10 left-0 ${expandNav ? 'w-full' : 'w-[223px]'} h-[60px] justify-center transition-all duration-200 z-20 ${step === 1 ? 'hidden min-[674px]:flex' : 'flex'}`}>
+    <div className={`fixed bottom-10 left-0 ${expandNav ? 'w-full' : 'w-[223px]'} h-[60px] justify-center transition-all duration-200 z-20 ${step === 1 ? 'hidden min-[674px]:flex' : 'hidden lg:flex'}`}>
       <div className={`${step === 2 ? 'max-lg:w-full' : ''} relative rounded-[8px] overflow-hidden flex mx-20`}>
         <div className={`flex gap-x-2 max-lg:w-full h-full z-10 p-2 ${step === 2 ? 'animated-background bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500' : ''}`}>
           <div onClick={handleNavWidth} className='min-w-[48px] h-full flex justify-center items-center rounded-[5px] bg-[#282826]'>

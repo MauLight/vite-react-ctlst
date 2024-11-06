@@ -103,17 +103,25 @@ export const Creator = ({ prompt, stream, setStream, isCollaboration }: { prompt
 
 
   return (
-    <div className="w-full min-h-full flex flex-col items-center px-20">
-      <div className="relative w-[1200px] shrink-0 min-h-[700px] border rounded-[10px] p-20 shadow-xl shadow-gray-50 flex flex-col gap-y-10">
-        {
-          stream !== null && stream.map((item) => (
-            <div key={item.id} className="w-full h-full flex justify-center">
-              {item.component}
-            </div>
-          ))
-        }
-        <div ref={scrollRef}></div>
+    <>
+      <div className="w-full min-h-full hidden lg:flex flex-col items-center px-20">
+        <div className="relative w-[1200px] shrink-0 min-h-[700px] border rounded-[10px] p-20 shadow-xl shadow-gray-50 flex flex-col gap-y-10">
+          {
+            stream !== null && stream.map((item) => (
+              <div key={item.id} className="w-full h-full flex justify-center">
+                {item.component}
+              </div>
+            ))
+          }
+          <div ref={scrollRef}></div>
+        </div>
       </div>
-    </div>
+      <div className="hidden max-lg:flex flex-col w-full h-[600px] gap-y-5 justify-center items-center">
+        <i className="fa-solid fa-2xl fa-triangle-exclamation"></i>
+        <h1 className='text-[0.9rem] min-[390px]:text-[1.2rem] text-gray-800'>
+          Creator mode needs a bigger screen.
+        </h1>
+      </div>
+    </>
   )
 }
