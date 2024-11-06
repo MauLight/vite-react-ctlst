@@ -1,5 +1,12 @@
 import type { Dispatch, SetStateAction, ReactElement, PropsWithChildren } from 'react'
 
+export interface InvitationProps {
+    senderId: string
+    senderUsername: string
+    recipientId: string
+    documentId: string
+}
+
 export interface ScreenplayPosterProps {
     id: string
     title: string

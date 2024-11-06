@@ -13,8 +13,6 @@ const APIKey = import.meta.env.VITE_GEMINI_API_KEY
 const Welcome = ({ generation, handleOnComplete }: WelcomeProps) => {
   const [ready, setReady] = useState<boolean>(false)
   const handleOnWelcomeComplete = (): void => {
-    console.log('here! Welcome!')
-    console.log(generation.split('Ctlst.done')[0])
     handleOnComplete()
     setTimeout(() => {
       setReady(true)
@@ -42,7 +40,7 @@ const Welcome = ({ generation, handleOnComplete }: WelcomeProps) => {
   )
 }
 
-export const Creator = ({ prompt, stream, setStream }: { prompt: string, stream: StreamElementProps[] | null, setStream: React.Dispatch<React.SetStateAction<StreamElementProps[] | null>> }): ReactElement => {
+export const Creator = ({ prompt, stream, setStream, isCollaboration }: { prompt: string, stream: StreamElementProps[] | null, setStream: React.Dispatch<React.SetStateAction<StreamElementProps[]>>, isCollaboration: boolean }): ReactElement => {
   const [generation, setGeneration] = useState<string>('')
   const [wasGenerated, setWasGenerated] = useState<boolean>(false)
 
@@ -75,7 +73,7 @@ export const Creator = ({ prompt, stream, setStream }: { prompt: string, stream:
   }
 
   useEffect(() => {
-    generateWithAI()
+    if (!isCollaboration) generateWithAI()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -87,7 +85,7 @@ export const Creator = ({ prompt, stream, setStream }: { prompt: string, stream:
   }, [generation])
 
   useEffect(() => {
-    if (stream !== null && stream.length === 1) {
+    if (stream !== null && stream.length === 1 && !isCollaboration) {
       setTimeout(() => {
         if (stream !== null) {
           setStream([...stream, { id: 1, type: 'help', component: <Help /> }])

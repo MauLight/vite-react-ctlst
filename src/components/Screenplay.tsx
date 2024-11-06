@@ -1,5 +1,5 @@
 import { createEditor, BaseEditor, Descendant, Transforms, Element, Editor } from "slate"
-import { useCallback, useEffect, useMemo, useState, type ReactElement } from 'react'
+import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState, type ReactElement } from 'react'
 import { Slate, Editable, withReact, ReactEditor } from 'slate-react'
 import { HocuspocusProvider } from '@hocuspocus/provider'
 
@@ -7,6 +7,7 @@ import debounce from 'lodash.debounce'
 import { Cursors } from "./Cursors"
 import * as Y from 'yjs'
 import { FadeLoader } from "react-spinners"
+import { colors } from "../utils/lists"
 
 const isDev = import.meta.env.DEV
 const weburl = isDev ? import.meta.env.VITE_WEBSOCKET_PORT_DEV : import.meta.env.VITE_WEBSOCKET_PORT_PROD
@@ -36,6 +37,12 @@ interface RenderElementsProps {
   attributes: Record<string, unknown>
 }
 
+const generateRandomColor = () => {
+  const index = Math.floor(Math.random() * colors.length)
+  console.log(index)
+  return colors[index]
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ScreenEditor = ({ sharedType, provider, username }: { sharedType: any, provider: any, connectToServerAsync: any, username: string }): ReactElement => {
 
@@ -43,7 +50,7 @@ const ScreenEditor = ({ sharedType, provider, username }: { sharedType: any, pro
     const e = withReact(withCursors(withYjs(createEditor(), sharedType), provider.awareness, {
       data: {
         name: username,
-        color: '#ec4899'
+        color: generateRandomColor()
       }
     }))
     const { normalizeNode } = e
@@ -292,7 +299,7 @@ const ScreenEditor = ({ sharedType, provider, username }: { sharedType: any, pro
   )
 }
 
-const Screenplay = () => {
+const Screenplay = ({ documentId, setDocumentId, isCollaboration }: { documentId?: string, setDocumentId: Dispatch<SetStateAction<string>>, isCollaboration?: boolean }) => {
   const [connected, setConnected] = useState<boolean>(false)
   const [sharedType, setSharedType] = useState<Y.XmlText>()
   const [provider, setProvider] = useState<HocuspocusProvider>()
@@ -302,6 +309,7 @@ const Screenplay = () => {
     mutationFn: postScreenplay,
     onSuccess: (res) => {
       connectToServerAsync(res.id)
+      setDocumentId(res.id)
     },
     onError: (error) => {
       console.log(error.message)
@@ -312,6 +320,7 @@ const Screenplay = () => {
     const token = currUser.token
     const yDoc = new Y.Doc()
     const sharedDoc = yDoc.get('screenwriter', Y.XmlText)
+
     const yProvider = new HocuspocusProvider({
       url: weburl,
       name: id,
@@ -333,7 +342,8 @@ const Screenplay = () => {
   }
 
   useEffect(() => {
-    mutation.mutate({ title: '', body: '' })
+    if (!isCollaboration) mutation.mutate({ title: '', body: '' })
+    else connectToServerAsync(documentId as string)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

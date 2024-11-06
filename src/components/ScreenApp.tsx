@@ -16,16 +16,19 @@ import { TheQuest } from './TheQuest'
 import { Chat } from './Chat/Chat'
 import { WaitingRoom } from './WaitingRoom'
 
-import { StreamElementProps } from '../utils/types'
+import { InvitationProps, StreamElementProps } from '../utils/types'
+import { sendInvitationToScreenplayAsync } from '../api/apiCalls'
 
-export const ScreenIndex = (): ReactElement => {
+export const ScreenIndex = ({ invitations }: { invitations: InvitationProps[] }): ReactElement => {
   const [step, setStep] = useState<number>(1)
   const [prompt, setPrompt] = useState<string>('')
 
-  const [stream, setStream] = useState<StreamElementProps[] | null>(null)
+  const [stream, setStream] = useState<StreamElementProps[]>([])
   const [creatorInputValue, setCreatorInputValue] = useState<string>('')
 
   const [chatIsOpen, setChatIsOpen] = useState<boolean>(false)
+  const [documentId, setDocumentId] = useState<string>('')
+  const [isCollaboration, setIsCollaboration] = useState<boolean>(false)
 
   const handlePrintScreenplay = (): void => {
     const element = document.getElementById('screenplay')
@@ -50,21 +53,25 @@ export const ScreenIndex = (): ReactElement => {
     }, 10000)
   }
 
+  const handleCollaborationNav = (documentId: string) => {
+    setIsCollaboration(true)
+    setStream([...stream, { id: stream.length, type: 'screenplay', component: <Screenplay isCollaboration documentId={documentId} setDocumentId={setDocumentId} /> }])
+    setStep(2)
+  }
+
   const handleEnterInput = (e: { key: string }) => {
     if (e.key === 'Enter') {
-      if (creatorInputValue.length > 0 && stream !== null) {
+      if (creatorInputValue.length > 0 && stream) {
 
         if (creatorInputValue.includes('invite')) {
-
           const invitedUser = creatorInputValue.split('/invite')[1].split(' ')[1].trim()
-          console.log(invitedUser)
 
           if (stream[stream.length - 1].type !== 'screenplay') {
             toast.error('Screenplay instance must be open before inviting a user.')
             return
           }
 
-          toast.success(`Invitation sent to ${invitedUser}`)
+          sendInvitationToScreenplayAsync(invitedUser, documentId)
           setCreatorInputValue('')
           setStream([...stream, { id: stream.length, type: 'waitingroom', component: <WaitingRoom /> }])
 
@@ -75,7 +82,7 @@ export const ScreenIndex = (): ReactElement => {
 
         switch (creatorInputValue) {
           case '/screenplay':
-            setStream([...stream, { id: stream.length, type: 'screenplay', component: <Screenplay /> }])
+            setStream([...stream, { id: stream.length, type: 'screenplay', component: <Screenplay setDocumentId={setDocumentId} /> }])
             break
           case '/print':
             handlePrintScreenplay()
@@ -106,7 +113,14 @@ export const ScreenIndex = (): ReactElement => {
   return (
     <div className='w-full bg-[#fdfdfd] flex justify-center items-center px-20 overflow-scroll scrollbar-hide'>
       {/* topbar */}
-      <Topbar handlePro={handlePro} prompt={prompt} setPrompt={setPrompt} setStep={setStep} />
+      <Topbar
+        invitations={invitations}
+        handlePro={handlePro}
+        prompt={prompt}
+        setPrompt={setPrompt}
+        setStep={setStep}
+        handleCollaborationNav={handleCollaborationNav}
+      />
       <div className="w-full pt-20 pb-20">
         {
           step === 1 && (
@@ -115,7 +129,7 @@ export const ScreenIndex = (): ReactElement => {
         }
         {
           step === 2 && (
-            <Creator stream={stream} setStream={setStream} prompt={prompt} />
+            <Creator isCollaboration={isCollaboration} stream={stream} setStream={setStream} prompt={prompt} />
           )
         }
         {
