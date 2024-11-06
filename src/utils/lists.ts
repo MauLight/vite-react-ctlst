@@ -65,9 +65,20 @@ const screenplayPosters = [
 
 export const randomAddedArrayBuilder = () => {
   const randomAddedArray: ScreenplayPosterProps[] = []
-  const copyArray =   [...screenplayPosters]
+  const copyArray = [...screenplayPosters]
   copyArray.forEach((item) => {
     randomAddedArray.push({ ...item, sizeChance: Math.random(), shapeChance: Math.random() })
   })
   return randomAddedArray
 }
+
+export const colors = [
+  '#ec4899',
+  '#f97316',
+  '#84cc16',
+  '#14B8A6',
+  '#06B6D4',
+  '#3b82f6',
+  '#6366f1',
+  '#a855f7'
+]
