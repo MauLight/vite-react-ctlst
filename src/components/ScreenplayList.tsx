@@ -5,7 +5,7 @@ import { ScreenplayCard } from './ScreenplayCard'
 
 export const ScreenplayList = (): ReactElement => {
   return (
-    <div className='w-full columns-5 gap-5 space-y-5'>
+    <div className='w-full columns-2 min-[500px]:columns-3 md:columns-5 gap-5 space-y-5'>
       {
         [...randomAddedArrayBuilder(), ...randomAddedArrayBuilder()].map((item: ScreenplayPosterProps, i: number) => (
           <ScreenplayCard key={i} item={item} />
