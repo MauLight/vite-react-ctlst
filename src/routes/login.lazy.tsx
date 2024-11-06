@@ -61,8 +61,7 @@ const Login = (): ReactElement => {
     <div className='relative w-full h-screen flex justify-center items-center'>
       <div className="absolute top-0 left-0 w-full h-[60px] flex justify-start px-10 bg-[#10100e]">
         <div className="relative w-[85px] flex items-center gap-x-2">
-          <i className="fa-solid fa-circle text-indigo-500"></i>
-          <video className='absolute -top-[46px] left-5 object-cover h-[150px]' src={logoWhite} autoPlay muted></video>
+          <video className='absolute -top-[46px] -left-6 min-[500px]:left-5 object-cover h-[150px]' src={logoWhite} autoPlay muted></video>
 
         </div>
       </div>
@@ -75,8 +74,8 @@ const Login = (): ReactElement => {
         )
           :
           (
-            <div className="w-[300px] flex flex-col gap-y-2">
-              <div className="relative w-[320px] min-h-[300px] bg-[#ffffff] flex flex-col rounded-[5px] px-5 pt-20 pb-4 gap-y-4">
+            <div className="min-[320px]:w-[320px] flex flex-col gap-y-2">
+              <div className="relative min-[320px]:w-[320px] min-h-[300px] bg-[#ffffff] flex flex-col rounded-[5px] px-5 pt-20 pb-4 gap-y-4">
                 <div className="flex flex-col items-center gap-y-1">
                   <video className='absolute -top-10' src={logoBlack} autoPlay muted loop></video>
                   <h1 className='font-light text-[1rem] text-[#10100e]'>Log in to Ctlst</h1>

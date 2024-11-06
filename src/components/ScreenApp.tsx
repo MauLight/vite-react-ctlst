@@ -111,7 +111,7 @@ export const ScreenIndex = ({ invitations }: { invitations: InvitationProps[] })
   }
 
   return (
-    <div className='w-full bg-[#fdfdfd] flex justify-center items-center px-20 overflow-scroll scrollbar-hide'>
+    <div className='w-full bg-[#fdfdfd] flex justify-center items-center px-5 sm:px-20 overflow-scroll scrollbar-hide'>
       {/* topbar */}
       <Topbar
         invitations={invitations}
