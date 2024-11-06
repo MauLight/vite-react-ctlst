@@ -22,6 +22,7 @@ export const Topbar = ({ prompt, setPrompt, setStep, handlePro, invitations, han
   const handleChange = (e: { target: { value: SetStateAction<string> } }) => {
     setPrompt(e.target.value)
   }
+
   const handleEnterEvent = (e: { key: string }) => {
     if (e.key === 'Enter' && prompt.length > 0) {
       setStep(2)
