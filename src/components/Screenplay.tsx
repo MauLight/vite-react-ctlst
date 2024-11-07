@@ -3,22 +3,22 @@ import { useCallback, useEffect, useMemo, useState, type ReactElement } from 're
 import { Slate, Editable, withReact, ReactEditor } from 'slate-react'
 import { HocuspocusProvider } from '@hocuspocus/provider'
 
-import debounce from 'lodash.debounce'
-import { Cursors } from "./Cursors"
 import * as Y from 'yjs'
-import { FadeLoader } from "react-spinners"
+import { Cursors } from "./Cursors"
+import debounce from 'lodash.debounce'
 import { colors } from "../utils/lists"
+import { FadeLoader } from "react-spinners"
 
 const isDev = import.meta.env.DEV
 const weburl = isDev ? import.meta.env.VITE_WEBSOCKET_PORT_DEV : import.meta.env.VITE_WEBSOCKET_PORT_PROD
 
 //* Components
-import { CharacterElement, DefaultElement, DialogElement, FadeElement, HeadingElement } from './Screenplay/Elements'
-import { LeafProps, ScreenplayProps } from '../utils/types'
 import { Leaf } from './Screenplay/Leafs'
-import { withCursors, withYjs, YjsEditor } from '@slate-yjs/core'
 import { useMutation } from "@tanstack/react-query"
+import { LeafProps, ScreenplayProps } from '../utils/types'
+import { withCursors, withYjs, YjsEditor } from '@slate-yjs/core'
 import { postScreenplay, updateScreenplayById } from "../api/apiCalls"
+import { CharacterElement, DefaultElement, DialogElement, FadeElement, HeadingElement } from './Screenplay/Elements'
 
 type CustomElement = { type: 'heading' | 'description' | 'character' | 'dialog' | 'fade', children: CustomText[] }
 type CustomText = { text: string, bold?: boolean, italic?: boolean }
