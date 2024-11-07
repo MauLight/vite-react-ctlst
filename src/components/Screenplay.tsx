@@ -1,5 +1,5 @@
 import { createEditor, BaseEditor, Descendant, Transforms, Element, Editor } from "slate"
-import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState, type ReactElement } from 'react'
+import { useCallback, useEffect, useMemo, useState, type ReactElement } from 'react'
 import { Slate, Editable, withReact, ReactEditor } from 'slate-react'
 import { HocuspocusProvider } from '@hocuspocus/provider'
 
@@ -14,11 +14,11 @@ const weburl = isDev ? import.meta.env.VITE_WEBSOCKET_PORT_DEV : import.meta.env
 
 //* Components
 import { CharacterElement, DefaultElement, DialogElement, FadeElement, HeadingElement } from './Screenplay/Elements'
-import { LeafProps } from '../utils/types'
+import { LeafProps, ScreenplayProps } from '../utils/types'
 import { Leaf } from './Screenplay/Leafs'
 import { withCursors, withYjs, YjsEditor } from '@slate-yjs/core'
 import { useMutation } from "@tanstack/react-query"
-import { postScreenplay } from "../api/apiCalls"
+import { postScreenplay, updateScreenplayById } from "../api/apiCalls"
 
 type CustomElement = { type: 'heading' | 'description' | 'character' | 'dialog' | 'fade', children: CustomText[] }
 type CustomText = { text: string, bold?: boolean, italic?: boolean }
@@ -39,12 +39,11 @@ interface RenderElementsProps {
 
 const generateRandomColor = () => {
   const index = Math.floor(Math.random() * colors.length)
-  console.log(index)
   return colors[index]
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ScreenEditor = ({ sharedType, provider, username }: { sharedType: any, provider: any, connectToServerAsync: any, username: string }): ReactElement => {
+const ScreenEditor = ({ sharedType, provider, username, documentId }: { sharedType: any, provider: any, connectToServerAsync: any, username: string, documentId: string | undefined }): ReactElement => {
 
   const editor = useMemo(() => {
     const e = withReact(withCursors(withYjs(createEditor(), sharedType), provider.awareness, {
@@ -265,7 +264,11 @@ const ScreenEditor = ({ sharedType, provider, username }: { sharedType: any, pro
   const debouncedSave = useCallback(
     debounce((value: Descendant[]) => {
       const content = JSON.stringify(value)
-      localStorage.setItem('ctlst-user-screenplay', content)
+      if (documentId && content.length > 0) {
+        updateScreenplayById(documentId, content)
+        return
+      }
+      //localStorage.setItem('ctlst-user-screenplay', content)
     }, 2000), []
   )
 
@@ -299,7 +302,7 @@ const ScreenEditor = ({ sharedType, provider, username }: { sharedType: any, pro
   )
 }
 
-const Screenplay = ({ documentId, setDocumentId, isCollaboration }: { documentId?: string, setDocumentId: Dispatch<SetStateAction<string>>, isCollaboration?: boolean }) => {
+const Screenplay = ({ title = '', documentId, setDocumentId, isCollaboration }: ScreenplayProps) => {
   const [connected, setConnected] = useState<boolean>(false)
   const [sharedType, setSharedType] = useState<Y.XmlText>()
   const [provider, setProvider] = useState<HocuspocusProvider>()
@@ -319,7 +322,7 @@ const Screenplay = ({ documentId, setDocumentId, isCollaboration }: { documentId
   const connectToServerAsync = async (id: string) => {
     const token = currUser.token
     const yDoc = new Y.Doc()
-    const sharedDoc = yDoc.get('screenwriter', Y.XmlText)
+    const sharedDoc = yDoc.get('screenplay', Y.XmlText)
 
     const yProvider = new HocuspocusProvider({
       url: weburl,
@@ -327,9 +330,16 @@ const Screenplay = ({ documentId, setDocumentId, isCollaboration }: { documentId
       document: yDoc,
       token
     })
-    yProvider.on('sync', () => {
+
+    yProvider.on('sync', (isSynced: boolean) => {
       setConnected(true)
+      console.log('Sync event - isSynced:', isSynced)
     })
+
+    yProvider.on('status', ({ status }: { status: string }) => {
+      console.log('Provider status:', status)
+    })
+
     yProvider.forceSync()
     setSharedType(sharedDoc)
     setProvider(yProvider)
@@ -342,7 +352,7 @@ const Screenplay = ({ documentId, setDocumentId, isCollaboration }: { documentId
   }
 
   useEffect(() => {
-    if (!isCollaboration) mutation.mutate({ title: '', body: '' })
+    if (!isCollaboration) mutation.mutate({ title, body: '' })
     else connectToServerAsync(documentId as string)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -355,6 +365,7 @@ const Screenplay = ({ documentId, setDocumentId, isCollaboration }: { documentId
 
   return (
     <ScreenEditor
+      documentId={documentId}
       username={currUser.username || ''}
       connectToServerAsync={connectToServerAsync}
       sharedType={sharedType}

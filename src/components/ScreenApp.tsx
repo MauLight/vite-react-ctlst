@@ -80,6 +80,15 @@ export const ScreenIndex = ({ invitations }: { invitations: InvitationProps[] })
           return
         }
 
+        if (creatorInputValue.includes('screenplay')) {
+          const title = creatorInputValue.substring(12)
+          if (title) {
+            setStream([...stream, { id: stream.length, type: 'screenplay', component: <Screenplay title={title} setDocumentId={setDocumentId} /> }])
+          }
+          setCreatorInputValue('')
+          return
+        }
+
         switch (creatorInputValue) {
           case '/screenplay':
             setStream([...stream, { id: stream.length, type: 'screenplay', component: <Screenplay setDocumentId={setDocumentId} /> }])
@@ -97,7 +106,7 @@ export const ScreenIndex = ({ invitations }: { invitations: InvitationProps[] })
             setStream([...stream, { id: stream.length, type: 'help', component: <Help /> }])
             break
           default:
-            setStream([...stream, { id: stream.length, type: 'warning', component: <div>Help with warning.</div> }])
+            setStream([...stream, { id: stream.length, type: 'warning', component: <Help /> }])
             break
         }
         setCreatorInputValue('')
@@ -139,6 +148,7 @@ export const ScreenIndex = ({ invitations }: { invitations: InvitationProps[] })
         }
       </div>
       <Navbar
+        handleCollaborationNav={handleCollaborationNav}
         creatorInputValue={creatorInputValue}
         setCreatorInputValue={setCreatorInputValue}
         handleEnterInput={handleEnterInput}

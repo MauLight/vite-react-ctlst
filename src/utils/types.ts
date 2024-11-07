@@ -42,3 +42,5 @@ export type RemoteCursorsProps = PropsWithChildren<{
 }>
 
 export interface LeafProps { attributes: object, children: ReactElement, leaf: Record<string, unknown> }
+
+export interface ScreenplayProps { title?: string, documentId?: string, setDocumentId: Dispatch<SetStateAction<string>>, isCollaboration?: boolean }

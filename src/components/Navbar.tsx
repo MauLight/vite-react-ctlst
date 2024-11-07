@@ -7,9 +7,10 @@ interface NavbarProps {
   setCreatorInputValue: Dispatch<SetStateAction<string>>
   handleEnterInput: (e: { key: string }) => void
   setChatIsOpen: Dispatch<SetStateAction<boolean>>
+  handleCollaborationNav: (id: string) => void
 }
 
-export const Navbar = ({ step, creatorInputValue, setCreatorInputValue, handleEnterInput, setChatIsOpen }: NavbarProps) => {
+export const Navbar = ({ step, creatorInputValue, setCreatorInputValue, handleEnterInput, setChatIsOpen, handleCollaborationNav }: NavbarProps) => {
   const [expandNav, setExpandNav] = useState<boolean>(true)
   const [expandSearch, setExpandSearch] = useState<boolean>(false)
   const [isCreator, setIsCreator] = useState<boolean>(false)
@@ -29,8 +30,8 @@ export const Navbar = ({ step, creatorInputValue, setCreatorInputValue, handleEn
 
   return (
     <div className={`fixed bottom-10 left-0 ${expandNav ? 'w-full' : 'w-[223px]'} h-[60px] justify-center transition-all duration-200 z-20 ${step === 1 ? 'hidden min-[674px]:flex' : 'hidden lg:flex'}`}>
-      <div className={`${step === 2 ? 'max-lg:w-full' : ''} relative rounded-[8px] overflow-hidden flex mx-20`}>
-        <div className={`flex gap-x-2 max-lg:w-full h-full z-10 p-2 ${step === 2 ? 'animated-background bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500' : ''}`}>
+      <div className={`${step === 2 ? 'max-lg:w-full' : ''} relative rounded-[8px] flex mx-20`}>
+        <div className={`relative flex gap-x-2 max-lg:w-full h-full z-10 p-2 rounded-[8px] ${step === 2 ? 'animated-background bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500' : ''}`}>
           <div onClick={handleNavWidth} className='min-w-[48px] h-full flex justify-center items-center rounded-[5px] bg-[#282826]'>
             <i className={`fa-solid fa-xl fa-hurricane text-[#ffffff] hover:text-indigo-500 ${expandNav ? 'rotate-45' : ''} transition-all duration-500`}></i>
           </div>
@@ -52,14 +53,14 @@ export const Navbar = ({ step, creatorInputValue, setCreatorInputValue, handleEn
             )
               :
               (
-                <NavbarButtons expandSearch={expandSearch} setExpandSearch={setExpandSearch} />
+                <NavbarButtons handleCollaborationNav={handleCollaborationNav} expandSearch={expandSearch} setExpandSearch={setExpandSearch} />
               )
           }
           <div onClick={() => { setChatIsOpen((prev: boolean) => !prev) }} className='h-full flex justify-center items-center px-3 bg-[#ffffff] hover:bg-indigo-500 border hover:border-transparent rounded-[5px] font-body text-[16px] text-[#40403e] hover:text-[#ffffff] transition-color duration-200 cursor-pointer'>
             <i className="fa-solid fa-comments"></i>
           </div>
         </div>
-        <div className="absolute w-full h-full bg-[#40403e] opacity-90 z-0"></div>
+        <div className="absolute w-full h-full bg-[#40403e] rounded-[8px] opacity-90 z-0"></div>
       </div>
     </div>
   )

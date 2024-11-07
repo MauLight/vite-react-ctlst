@@ -8,6 +8,11 @@ interface LoginProps {
     password: string
 }
 
+const headers = {
+    'Authorization': `Bearer ${user.token}`,
+    'Content-Type': 'application/json'
+}
+
 export const postLogin = async (credentials: LoginProps) => {
     try {
         const response = await axios.post(`${url}/login`, credentials)
@@ -24,10 +29,7 @@ export const postLogin = async (credentials: LoginProps) => {
 export const postScreenplay = async (screenplay: { title: string, body: string }) => {
     try {
         const response = await axios.post(`${url}/screenplay`, { ...screenplay, id: user.id }, {
-            headers: {
-                'Authorization': `Bearer ${user.token}`,
-                'Content-Type': 'application/json'
-            }
+            headers
         })
         return response.data
     } catch (error) {
@@ -39,15 +41,34 @@ export const postScreenplay = async (screenplay: { title: string, body: string }
 export const sendInvitationToScreenplayAsync = async (recipientId: string, documentId: string) => {
     try {
         const response = await axios.post(`${url}/events/send`, { senderId: user.id, senderUsername: user.username, recipientId, documentId }, {
-            headers: {
-                'Authorization': `Bearer ${user.token}`,
-                'Content-Type': 'application/json'
-            }
+            headers
         })
-        console.log(response.data.message)
         toast.success(response.data.message)
     } catch (error) {
         console.log('Server error: ', error)
     }
 
+}
+
+export const getScrenplaysByUserId = async () => {
+    try {
+        const response = await axios.get(`${url}/user/screenplays/${user.id}`, {
+            headers
+        })
+        return response.data
+    } catch (error) {
+        console.error('Server error: ', error)
+    }
+}
+
+export const updateScreenplayById = async (id: string, content: string) => {
+    try {
+        const response = await axios.put(`${url}/screenplay`, { id, content }, {
+            headers
+        })
+
+        return response.data
+    } catch (error) {
+        console.error('Server error: ', error)
+    }
 }
