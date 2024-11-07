@@ -26,6 +26,7 @@ export const Topbar = ({ prompt, setPrompt, setStep, handlePro, invitations, han
   const handleEnterEvent = (e: { key: string }) => {
     if (e.key === 'Enter' && prompt.length > 0) {
       setStep(2)
+      setIsActive(false)
       setPrompt('')
     }
   }
@@ -61,7 +62,7 @@ export const Topbar = ({ prompt, setPrompt, setStep, handlePro, invitations, han
   }, [])
 
   return (
-    <div id='topbar' className={`fixed top-0 left-0 w-full h-[60px] flex items-center justify-between px-2 sm:px-20 bg-[#fdfdfd] z-20 ${Ypos > 45 ? 'shadow-sm shadow-gray-300' : ''}`}>
+    <div id='topbar' className={`fixed top-0 left-0 w-full h-[60px] flex items-center justify-between px-2 sm:px-20 bg-[#fdfdfd] z-20 ${Ypos > 45 ? 'shadow-sm' : ''}`}>
       <video onClick={() => { setStep(1) }} className='absolute -top-[46px] -left-20 sm:-left-4 object-cover h-[150px]' src={logoBlack} autoPlay muted></video>
       <div className="w-full flex justify-end gap-x-10">
         <div className={`relative hidden sm:flex h-11 items-center px-[0.2rem] rounded-[5px] transition-all duration-200 ${isActive ? 'w-[40rem] animated-background bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-[2px]' : 'w-[20rem] bg-transparent'}`}>
