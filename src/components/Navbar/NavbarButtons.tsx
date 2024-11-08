@@ -2,6 +2,8 @@ import { Dispatch, SetStateAction, useState, type ReactElement } from 'react'
 import { getScrenplaysByUserId } from '../../api/apiCalls'
 import { motion } from 'framer-motion'
 import { fadeIn } from '../../utils/functions'
+import { format } from 'date-fns'
+import { toast } from 'react-toastify'
 
 interface NavbarButtonsProps {
   expandSearch: boolean
@@ -15,6 +17,8 @@ interface ScreenplayProps {
   userId: string
   body: string
   allowedUsers: string[]
+  updated_at: string
+  created_at: string
 }
 
 export const NavbarButtons = ({ expandSearch, setExpandSearch, handleCollaborationNav }: NavbarButtonsProps): ReactElement => {
@@ -28,8 +32,12 @@ export const NavbarButtons = ({ expandSearch, setExpandSearch, handleCollaborati
   const handleOpenProjects = async () => {
     if (screenplaysFromDb.length === 0) {
       const { screenplays } = await getScrenplaysByUserId()
+      if (screenplays.length === 0) {
+        toast.error('You have no saved screenplays.')
+      }
       setScreenplaysFromDb(screenplays)
     }
+
     setOpenScreenplayMenu(!openScreenplaysMenu)
   }
 
@@ -79,7 +87,10 @@ export const NavbarButtons = ({ expandSearch, setExpandSearch, handleCollaborati
             {
               screenplaysFromDb.map((screenplay) => (
                 <ul key={screenplay.id}>
-                  <li onClick={() => { handleClickNotification(1, screenplay.id) }} className='text-gray-600 hover:animated-background hover:bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:inline-block hover:text-transparent hover:bg-clip-text transition-all duration-200 cursor-pointer'>- {screenplay.title + screenplay.id}</li>
+                  <li onClick={() => { handleClickNotification(1, screenplay.id) }} className='flex gap-x-5 items-end cursor-pointer'>
+                    <p className='leading-none animated-background bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 inline-block text-transparent bg-clip-text transition-all duration-200'>- {screenplay.title}</p>
+                    <p className='text-[0.8rem] text-gray-600 leading-none'>{`Last update on ${format(new Date(Number(screenplay.updated_at)), 'PPP')}`}</p>
+                  </li>
                 </ul>
               ))
             }

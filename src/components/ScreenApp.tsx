@@ -34,7 +34,7 @@ export const ScreenIndex = ({ invitations }: { invitations: InvitationProps[] })
     const element = document.getElementById('screenplay')
     const opt = {
       hotfixes: 'px_scaling',
-      margin: 1,
+      margin: [20, 1, 20, 1],
       filename: `Screenplay-${format(new Date(), 'yyyy-MMM-dd')}.pdf`,
       jsPDF: {
         unit: 'mm', format: 'letter', orientation: 'portrait'

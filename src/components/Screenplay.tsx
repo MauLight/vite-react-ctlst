@@ -1,5 +1,5 @@
-import { createEditor, BaseEditor, Descendant, Transforms, Element, Editor } from "slate"
-import { useCallback, useEffect, useMemo, useState, type ReactElement } from 'react'
+import { createEditor, BaseEditor, Descendant, Transforms, Element, Editor, BaseElement } from "slate"
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactElement } from 'react'
 import { Slate, Editable, withReact, ReactEditor } from 'slate-react'
 import { HocuspocusProvider } from '@hocuspocus/provider'
 
@@ -18,9 +18,9 @@ import { useMutation } from "@tanstack/react-query"
 import { LeafProps, ScreenplayProps } from '../utils/types'
 import { withCursors, withYjs, YjsEditor } from '@slate-yjs/core'
 import { postScreenplay, updateScreenplayById } from "../api/apiCalls"
-import { CharacterElement, DefaultElement, DialogElement, FadeElement, HeadingElement } from './Screenplay/Elements'
+import { BreakElement, CharacterElement, DefaultElement, DialogElement, FadeElement, HeadingElement, PageElement } from './Screenplay/Elements'
 
-type CustomElement = { type: 'heading' | 'description' | 'character' | 'dialog' | 'fade', children: CustomText[] }
+type CustomElement = { type: 'page' | 'heading' | 'description' | 'character' | 'dialog' | 'fade' | 'break', children: CustomText[] | CustomElement[] }
 type CustomText = { text: string, bold?: boolean, italic?: boolean }
 
 declare module 'slate' {
@@ -45,6 +45,9 @@ const generateRandomColor = () => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ScreenEditor = ({ sharedType, provider, username, documentId }: { sharedType: any, provider: any, connectToServerAsync: any, username: string, documentId: string | undefined }): ReactElement => {
 
+  const screenplayRef = useRef<HTMLDivElement>(null)
+  const [enterHappened, setEnterHappened] = useState<boolean>(false)
+
   const editor = useMemo(() => {
     const e = withReact(withCursors(withYjs(createEditor(), sharedType), provider.awareness, {
       data: {
@@ -63,6 +66,8 @@ const ScreenEditor = ({ sharedType, provider, username, documentId }: { sharedTy
     return e
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const [childrenCount, setChildrenCount] = useState<number>(editor.children.length)
 
   const initialValue: Descendant[] = useMemo(() => editor.children.length > 0 ? editor.children : [
     {
@@ -103,71 +108,105 @@ const ScreenEditor = ({ sharedType, provider, username, documentId }: { sharedTy
 
   }
 
+  const insertContentIntoPage = (editor: BaseEditor & ReactEditor, contentNode: CustomElement) => {
+    const { children } = editor
+    const lastNodeIndex = children.length - 1
+    let pageIndex = lastNodeIndex
+    let pagePath = [pageIndex]
+
+    const lastNode = children[pageIndex] as CustomElement
+
+    if (!lastNode || lastNode.type !== 'page') {
+      Transforms.insertNodes(
+        editor,
+        { type: 'page', children: [] },
+        { at: [children.length] }
+      )
+      pageIndex = children.length
+      pagePath = [pageIndex]
+    }
+
+    const insertionPath = pagePath.concat([(editor.children[pageIndex] as CustomElement)?.children?.length || 0])
+
+    Transforms.insertNodes(
+      editor,
+      contentNode,
+      {
+        at: insertionPath,
+      }
+    )
+
+    Transforms.select(editor, Editor.end(editor, insertionPath))
+  }
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    const prevType = editor.children.length > 0 ? (editor.children[editor.children.length - 1] as CustomElement).type : null
+    const lastPageIndex = editor.children.length - 1
+    const lastPage = (editor.children[lastPageIndex] as CustomElement).children as CustomElement[]
+    const prevType = lastPage.length > 0 ? (lastPage[lastPage.length - 1] as CustomElement).type : null
+
+    if (e.key === 'Backspace' && prevType) {
+      console.log(editor.children)
+      if (childrenCount > editor.children.length) {
+        //const lastBreak = editor.children.fin
+        setChildrenCount(editor.children.length)
+      }
+    }
 
     if (e.key === 'Enter' && prevType) {
+
+      console.log(prevType)
+
+      setEnterHappened(!enterHappened)
+
+      let newNode: CustomElement
+
       switch (prevType) {
         case 'heading': {
           e.preventDefault()
-          Transforms.insertNodes(
-            editor,
-            {
-              type: 'description',
-              children: [{ text: '' }]
-            }
-          )
+          newNode = {
+            type: 'description',
+            children: [{ text: '' }]
+          }
           break
         }
 
         case 'description': {
           e.preventDefault()
-          Transforms.insertNodes(
-            editor,
-            {
-              type: 'description',
-              children: [{ text: '' }]
-            }
-          )
+          newNode = {
+            type: 'description',
+            children: [{ text: '' }]
+          }
           break
         }
 
         case 'character': {
           e.preventDefault()
-          Transforms.insertNodes(
-            editor,
-            {
-              type: 'dialog',
-              children: [{ text: '' }]
-            }
-          )
+          newNode = {
+            type: 'dialog',
+            children: [{ text: '' }]
+          }
           break
         }
 
         case 'dialog': {
           e.preventDefault()
-          Transforms.insertNodes(
-            editor,
-            {
-              type: 'character',
-              children: [{ text: '' }]
-            }
-          )
+          newNode = {
+            type: 'character',
+            children: [{ text: '' }]
+          }
           break
         }
 
         default: {
           e.preventDefault()
-          Transforms.insertNodes(
-            editor,
-            {
-              type: 'description',
-              children: [{ text: '' }]
-            }
-          )
+          newNode = {
+            type: 'description',
+            children: [{ text: '' }]
+          }
           break
         }
       }
+      insertContentIntoPage(editor, newNode)
     }
 
     //* If command key (mac) hasn't been pressed, return.
@@ -242,6 +281,8 @@ const ScreenEditor = ({ sharedType, provider, username, documentId }: { sharedTy
 
   const renderElement = useCallback((props: RenderElementsProps) => {
     switch (props.element.type) {
+      case 'page':
+        return <PageElement {...props} />
       case 'heading':
         return <HeadingElement {...props} />
       case 'description':
@@ -252,6 +293,8 @@ const ScreenEditor = ({ sharedType, provider, username, documentId }: { sharedTy
         return <DialogElement {...props} />
       case 'fade':
         return <FadeElement {...props} />
+      case 'break':
+        return <BreakElement {...props} />
       default:
         return <DefaultElement {...props} />
     }
@@ -281,8 +324,23 @@ const ScreenEditor = ({ sharedType, provider, username, documentId }: { sharedTy
     return () => YjsEditor.disconnect(editor)
   }, [editor])
 
+  console.log(editor.children)
+
+  useEffect(() => {
+    if (editor.children.length > 0 && (editor.children[0] as CustomElement).type !== 'page') {
+      Transforms.wrapNodes(
+        editor,
+        { type: 'page', children: [] },
+        {
+          at: [0],
+          match: n => Element.isElement(n) && n.type !== 'page'
+        }
+      )
+    }
+  }, [])
+
   return (
-    <div className="shrink-0 pt-20 font-screenplay border rounded-[10px] text-[1rem]">
+    <div ref={screenplayRef} className="shrink-0 font-screenplay border rounded-[10px] text-[1rem]">
       <Slate
         editor={editor}
         initialValue={initialValue}
@@ -294,7 +352,7 @@ const ScreenEditor = ({ sharedType, provider, username, documentId }: { sharedTy
             onKeyDown={handleKeyDown}
             renderElement={renderElement}
             renderLeaf={renderLeaf}
-            className="outline-none p-20 w-[816px] min-h-[416px]"
+            className="outline-none px-20 py-12 w-[816px] min-h-[416px]"
           />
         </Cursors>
       </Slate>
