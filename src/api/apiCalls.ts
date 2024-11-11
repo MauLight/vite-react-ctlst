@@ -70,5 +70,6 @@ export const updateScreenplayById = async (id: string, content: string) => {
         return response.data
     } catch (error) {
         console.error('Server error: ', error)
+        return error
     }
 }

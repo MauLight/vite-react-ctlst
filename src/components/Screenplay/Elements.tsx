@@ -42,7 +42,7 @@ export const FadeElement = (props: { attributes: object, children: ReactElement 
 
 export const BreakElement = (props: { attributes: object, children: ReactElement }) => {
   return (
-    <div {...props.attributes} className="html2pdf__page-break hidden">
+    <div {...props.attributes} style={{ pageBreakAfter: 'always' }} className="html2pdf__page-break">
       {props.children}
     </div>
   )

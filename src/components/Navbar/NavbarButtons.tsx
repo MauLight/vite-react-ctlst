@@ -82,18 +82,20 @@ export const NavbarButtons = ({ expandSearch, setExpandSearch, handleCollaborati
             initial={'hidden'}
             whileInView={'show'}
             viewport={{ once: true, amount: 0.1 }}
-            className='absolute -top-[210px] left-0 w-full min-h-[200px] flex flex-col gap-y-2 py-8 px-10 rounded-[8px] bg-[#ffffff]'>
+            className='absolute -top-[210px] left-0 w-full h-[200px] flex flex-col gap-y-2 py-8 px-10 rounded-[8px] bg-[#ffffff]'>
             <h1 className='text-gray-800 text-[1.2rem]'>Your Screenplays: </h1>
-            {
-              screenplaysFromDb.map((screenplay) => (
-                <ul key={screenplay.id}>
-                  <li onClick={() => { handleClickNotification(1, screenplay.id) }} className='flex gap-x-5 items-end cursor-pointer'>
-                    <p className='leading-none animated-background bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 inline-block text-transparent bg-clip-text transition-all duration-200'>- {screenplay.title}</p>
-                    <p className='text-[0.8rem] text-gray-600 leading-none'>{`Last update on ${format(new Date(Number(screenplay.updated_at)), 'PPP')}`}</p>
-                  </li>
-                </ul>
-              ))
-            }
+            <div className='overflow-scroll scrollbar-hide flex flex-col gap-y-1'>
+              {
+                screenplaysFromDb.map((screenplay) => (
+                  <ul key={screenplay.id}>
+                    <li onClick={() => { handleClickNotification(1, screenplay.id) }} className='flex gap-x-5 items-end cursor-pointer'>
+                      <p className='leading-none animated-background bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 inline-block text-transparent bg-clip-text transition-all duration-200'>- {screenplay.title}</p>
+                      <p className='text-[0.8rem] text-gray-600 leading-none'>{`Last update on ${format(new Date(Number(screenplay.updated_at)), 'PPP')}`}</p>
+                    </li>
+                  </ul>
+                ))
+              }
+            </div>
           </motion.div>
         )
       }
