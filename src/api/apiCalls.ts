@@ -17,7 +17,6 @@ export const postLogin = async (credentials: LoginProps) => {
     try {
         const response = await axios.post(`${url}/login`, credentials)
         if (response) {
-            console.log(response.data)
             localStorage.setItem('ctlst-user', JSON.stringify(response.data))
         }
 
