@@ -17,7 +17,6 @@ export const postLogin = async (credentials: LoginProps) => {
     try {
         const response = await axios.post(`${url}/login`, credentials)
         if (response) {
-            console.log(response.data)
             localStorage.setItem('ctlst-user', JSON.stringify(response.data))
         }
 
@@ -28,7 +27,7 @@ export const postLogin = async (credentials: LoginProps) => {
 
 export const postScreenplay = async (screenplay: { title: string, body: string }) => {
     try {
-        const response = await axios.post(`${url}/screenplay`, { ...screenplay, id: user.id }, {
+        const response = await axios.post(`${url}/screenplay`, { ...screenplay, id: user.id, created_at: Date.now().toString(), updated_at: Date.now().toString() }, {
             headers
         })
         return response.data
@@ -63,12 +62,13 @@ export const getScrenplaysByUserId = async () => {
 
 export const updateScreenplayById = async (id: string, content: string) => {
     try {
-        const response = await axios.put(`${url}/screenplay`, { id, content }, {
+        const response = await axios.put(`${url}/screenplay`, { id, content, updated_at: Date.now().toString() }, {
             headers
         })
 
         return response.data
     } catch (error) {
         console.error('Server error: ', error)
+        return error
     }
 }

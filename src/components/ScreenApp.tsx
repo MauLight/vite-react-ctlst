@@ -30,11 +30,13 @@ export const ScreenIndex = ({ invitations }: { invitations: InvitationProps[] })
   const [documentId, setDocumentId] = useState<string>('')
   const [isCollaboration, setIsCollaboration] = useState<boolean>(false)
 
+  const [expandNav, setExpandNav] = useState<boolean>(true)
+
   const handlePrintScreenplay = (): void => {
     const element = document.getElementById('screenplay')
     const opt = {
       hotfixes: 'px_scaling',
-      margin: 1,
+      margin: [20, 1, 35, 1],
       filename: `Screenplay-${format(new Date(), 'yyyy-MMM-dd')}.pdf`,
       jsPDF: {
         unit: 'mm', format: 'letter', orientation: 'portrait'
@@ -54,8 +56,10 @@ export const ScreenIndex = ({ invitations }: { invitations: InvitationProps[] })
   }
 
   const handleCollaborationNav = (documentId: string) => {
+    console.log(documentId)
     setIsCollaboration(true)
     setStream([...stream, { id: stream.length, type: 'screenplay', component: <Screenplay isCollaboration documentId={documentId} setDocumentId={setDocumentId} /> }])
+    setExpandNav(false)
     setStep(2)
   }
 
@@ -80,11 +84,12 @@ export const ScreenIndex = ({ invitations }: { invitations: InvitationProps[] })
           return
         }
 
-        if (creatorInputValue.includes('screenplay')) {
+        if (creatorInputValue.includes('screenplay') && creatorInputValue.substring(12)) {
           const title = creatorInputValue.substring(12)
           if (title) {
             setStream([...stream, { id: stream.length, type: 'screenplay', component: <Screenplay title={title} setDocumentId={setDocumentId} /> }])
           }
+          setExpandNav(false)
           setCreatorInputValue('')
           return
         }
@@ -92,6 +97,7 @@ export const ScreenIndex = ({ invitations }: { invitations: InvitationProps[] })
         switch (creatorInputValue) {
           case '/screenplay':
             setStream([...stream, { id: stream.length, type: 'screenplay', component: <Screenplay setDocumentId={setDocumentId} /> }])
+            setExpandNav(false)
             break
           case '/print':
             handlePrintScreenplay()
@@ -148,6 +154,8 @@ export const ScreenIndex = ({ invitations }: { invitations: InvitationProps[] })
         }
       </div>
       <Navbar
+        expandNav={expandNav}
+        setExpandNav={setExpandNav}
         handleCollaborationNav={handleCollaborationNav}
         creatorInputValue={creatorInputValue}
         setCreatorInputValue={setCreatorInputValue}

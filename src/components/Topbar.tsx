@@ -51,7 +51,6 @@ export const Topbar = ({ prompt, setPrompt, setStep, handlePro, invitations, han
   }
 
   useEffect(() => {
-
     window.addEventListener('scroll', () => {
       setYpos(window.scrollY)
     })

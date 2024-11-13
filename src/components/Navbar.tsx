@@ -8,10 +8,11 @@ interface NavbarProps {
   handleEnterInput: (e: { key: string }) => void
   setChatIsOpen: Dispatch<SetStateAction<boolean>>
   handleCollaborationNav: (id: string) => void
+  expandNav: boolean
+  setExpandNav: Dispatch<SetStateAction<boolean>>
 }
 
-export const Navbar = ({ step, creatorInputValue, setCreatorInputValue, handleEnterInput, setChatIsOpen, handleCollaborationNav }: NavbarProps) => {
-  const [expandNav, setExpandNav] = useState<boolean>(true)
+export const Navbar = ({ step, creatorInputValue, setCreatorInputValue, handleEnterInput, setChatIsOpen, handleCollaborationNav, expandNav, setExpandNav }: NavbarProps) => {
   const [expandSearch, setExpandSearch] = useState<boolean>(false)
   const [isCreator, setIsCreator] = useState<boolean>(false)
 
@@ -29,15 +30,15 @@ export const Navbar = ({ step, creatorInputValue, setCreatorInputValue, handleEn
   }, [step])
 
   return (
-    <div className={`fixed bottom-10 left-0 ${expandNav ? 'w-full' : 'w-[223px]'} h-[60px] justify-center transition-all duration-200 z-20 ${step === 1 ? 'hidden min-[674px]:flex' : 'hidden lg:flex'}`}>
-      <div className={`${step === 2 ? 'max-lg:w-full' : ''} relative rounded-[8px] flex mx-20`}>
+    <div className={`fixed bottom-10 left-0 ${expandNav ? 'w-screen' : 'w-[280px]'} h-[60px] justify-center transition-all duration-200 z-20 ${step === 1 ? 'hidden min-[674px]:flex' : 'hidden lg:flex'}`}>
+      <div className={`${step === 2 ? 'max-lg:w-full' : ''} relative rounded-[8px] flex`}>
         <div className={`relative flex gap-x-2 max-lg:w-full h-full z-10 p-2 rounded-[8px] ${step === 2 ? 'animated-background bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500' : ''}`}>
           <div onClick={handleNavWidth} className='min-w-[48px] h-full flex justify-center items-center rounded-[5px] bg-[#282826]'>
             <i className={`fa-solid fa-xl fa-hurricane text-[#ffffff] hover:text-indigo-500 ${expandNav ? 'rotate-45' : ''} transition-all duration-500`}></i>
           </div>
           {
-            step === 2 ? (
-              <div className="sm:w-[600px] flex gap-x-2 bg-[#40403e] rounded-[5px]">
+            step === 2 && expandNav && (
+              <div className={`${expandNav ? 'w-[600px]' : ''} flex gap-x-2 bg-[#40403e] rounded-[5px]`}>
                 <div
                   className={`w-full lg:w-[600px] flex justify-center items-center animated-background bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-[2px] rounded-[5px] transition-all duration-200`}>
                   <input
@@ -51,10 +52,13 @@ export const Navbar = ({ step, creatorInputValue, setCreatorInputValue, handleEn
                 </div>
               </div>
             )
-              :
+          }
+          {
+            (step === 1 || step === 3) && expandNav && (
               (
                 <NavbarButtons handleCollaborationNav={handleCollaborationNav} expandSearch={expandSearch} setExpandSearch={setExpandSearch} />
               )
+            )
           }
           <div onClick={() => { setChatIsOpen((prev: boolean) => !prev) }} className='h-full flex justify-center items-center px-3 bg-[#ffffff] hover:bg-indigo-500 border hover:border-transparent rounded-[5px] font-body text-[16px] text-[#40403e] hover:text-[#ffffff] transition-color duration-200 cursor-pointer'>
             <i className="fa-solid fa-comments"></i>
