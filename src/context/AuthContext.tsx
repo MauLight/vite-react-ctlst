@@ -11,7 +11,7 @@ export const AuthContext = createContext({})
 
 export const AuthContextProvider = (props: ProviderProps<unknown>) => {
 
-    const [auth, setAuth] = useState<UserProps | null>(null)
+    const [auth, setAuth] = useState<UserProps | null>(() => JSON.parse(localStorage.getItem('ctlst-user') || ''))
 
     const value = [auth, setAuth]
 
