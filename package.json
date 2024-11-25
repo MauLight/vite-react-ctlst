@@ -44,7 +44,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.1.0",
     "@eslint/js": "^9.14.0",
-    "@tanstack/router-devtools": "^1.78.2",
+    "@tanstack/router-devtools": "^1.82.8",
     "@tanstack/router-plugin": "^1.78.2",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.0.1",
